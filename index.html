@@ -1,0 +1,643 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>🐘 曼谷+普吉岛 8天 · 2026.9.22–29</title>
+<meta name="description" content="福州出发，曼谷3晚+普吉岛4晚，出海浮潜+海豚+悬崖日落+SPA">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<style>
+:root {
+  --bg-primary:    #ffffff;
+  --bg-secondary:  #f5f5f7;
+  --bg-tertiary:   #fbfbfd;
+  --bg-grouped:    #f2f2f7;
+  --bg-elevated:   #ffffff;
+  --text-primary:   #1d1d1f;
+  --text-secondary: #86868b;
+  --text-tertiary:  #aeaeb2;
+  --accent:        #0071e3;
+  --accent-hover:  #0077ed;
+  --tint-red:    #ff3b30;
+  --tint-orange: #ff9500;
+  --tint-green:  #34c759;
+  --tint-blue:   #007aff;
+  --tint-purple: #af52de;
+  --tint-pink:   #ff2d55;
+  --separator:  rgba(60, 60, 67, .12);
+  --shadow-sm:  0 1px 3px rgba(0,0,0,.06), 0 1px 2px rgba(0,0,0,.04);
+  --shadow-md:  0 4px 14px rgba(0,0,0,.08);
+  --shadow-lg:  0 8px 30px rgba(0,0,0,.12);
+  --radius-sm:  8px;
+  --radius-md:  12px;
+  --radius-lg:  16px;
+  --radius-xl:  20px;
+  --safe-top:    env(safe-area-inset-top, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display",
+               "Helvetica Neue", "Arial", sans-serif;
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  line-height: 1.47059;
+  letter-spacing: -0.022em;
+}
+a { color: var(--accent); text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+#map { width: 100%; height: 40vh; min-height: 280px; position: sticky; top: 0; z-index: 100; }
+.locate-btn {
+  width: 36px; height: 36px; border-radius: 8px;
+  background: rgba(255,255,255,.92); backdrop-filter: blur(8px);
+  border: none; box-shadow: 0 1px 4px rgba(0,0,0,.18);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 18px; cursor: pointer; -webkit-tap-highlight-color: transparent;
+}
+.locate-btn.active { color: #007aff; }
+@keyframes loc-pulse {
+  0%   { transform: scale(1); opacity: .55; }
+  100% { transform: scale(2.4); opacity: 0; }
+}
+.loc-pulse {
+  width: 14px; height: 14px; border-radius: 50%;
+  background: rgba(0,122,255,.25);
+  animation: loc-pulse 1.6s ease-out infinite;
+}
+
+.tabs {
+  display: flex; gap: 6px; padding: 12px 16px; overflow-x: auto; -webkit-overflow-scrolling: touch;
+  background: rgba(255,255,255,.85); -webkit-backdrop-filter: saturate(180%) blur(20px);
+  backdrop-filter: saturate(180%) blur(20px); position: sticky; top: 40vh; z-index: 99;
+  border-bottom: .5px solid var(--separator); scrollbar-width: none;
+}
+.tabs::-webkit-scrollbar { display: none; }
+.tab {
+  flex-shrink: 0; padding: 7px 16px; border-radius: 980px; border: none;
+  background: var(--bg-grouped); color: var(--text-secondary);
+  font-size: 14px; font-weight: 500; cursor: pointer; transition: all .25s ease;
+  white-space: nowrap; letter-spacing: -0.01em;
+}
+.tab:active { transform: scale(.96); }
+.tab.active { background: var(--accent); color: #fff; }
+
+.content { max-width: 680px; margin: 0 auto; padding: 16px 16px calc(24px + var(--safe-bottom)); }
+
+.hero { text-align: center; padding: 28px 20px 20px; }
+.hero h1 { font-size: 28px; font-weight: 700; letter-spacing: -0.025em; line-height: 1.15; }
+.hero .subtitle { font-size: 17px; color: var(--text-secondary); margin-top: 6px; font-weight: 400; }
+
+.info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px; }
+.info-card { background: var(--bg-elevated); border-radius: var(--radius-lg); padding: 16px; box-shadow: var(--shadow-sm); }
+.info-card .label { font-size: 12px; font-weight: 600; color: var(--text-secondary); text-transform: uppercase; letter-spacing: .02em; margin-bottom: 6px; }
+.info-card .value { font-size: 15px; font-weight: 600; line-height: 1.4; }
+
+.section-head { font-size: 13px; font-weight: 600; color: var(--text-secondary); text-transform: uppercase; letter-spacing: .03em; padding: 20px 0 8px; }
+
+.day-head { padding: 20px 0 12px; }
+.day-head h2 { font-size: 22px; font-weight: 700; letter-spacing: -0.02em; }
+.day-head p { font-size: 15px; color: var(--text-secondary); margin-top: 2px; }
+
+.route-bar { background: var(--bg-elevated); border-radius: var(--radius-md); padding: 12px 14px; margin-bottom: 14px; box-shadow: var(--shadow-sm); font-size: 13px; color: var(--text-secondary); line-height: 1.7; white-space: pre-line; }
+.route-bar strong { color: var(--text-primary); }
+
+.timeline { position: relative; padding-left: 24px; }
+.timeline::before { content: ''; position: absolute; left: 7px; top: 20px; bottom: 20px; width: 1.5px; background: var(--separator); }
+.tl-item { position: relative; margin-bottom: 10px; }
+.tl-dot { position: absolute; left: -20px; top: 18px; width: 10px; height: 10px; border-radius: 50%; z-index: 1; box-shadow: 0 0 0 3px var(--bg-secondary); }
+.tl-dot.food    { background: var(--tint-red); }
+.tl-dot.spot    { background: var(--tint-blue); }
+.tl-dot.hotel   { background: var(--tint-orange); }
+.tl-dot.drink   { background: var(--tint-purple); }
+.tl-dot.transport { background: var(--text-tertiary); }
+
+.card { background: var(--bg-elevated); border-radius: var(--radius-md); padding: 14px 16px; box-shadow: var(--shadow-sm); transition: box-shadow .25s ease; cursor: pointer; }
+.card:active { box-shadow: var(--shadow-md); }
+.card .time { font-size: 12px; font-weight: 600; color: var(--text-tertiary); letter-spacing: .01em; }
+.card .name { font-size: 17px; font-weight: 600; margin: 2px 0 4px; letter-spacing: -0.01em; display: flex; align-items: center; gap: 6px; }
+.card .desc { font-size: 14px; color: var(--text-secondary); line-height: 1.45; }
+
+.badge { display: inline-flex; align-items: center; font-size: 11px; font-weight: 700; padding: 1px 7px; border-radius: 4px; }
+.badge.food   { background: rgba(255,59,48,.1);  color: var(--tint-red); }
+.badge.spot   { background: rgba(0,122,255,.1);  color: var(--tint-blue); }
+.badge.drink  { background: rgba(175,82,222,.1); color: var(--tint-purple); }
+
+.budget { display: inline-block; margin-top: 6px; padding: 3px 10px; background: var(--bg-grouped); border-radius: var(--radius-sm); font-size: 12px; color: var(--text-secondary); font-weight: 500; }
+
+.pays { display: flex; gap: 4px; flex-wrap: wrap; margin-top: 6px; }
+.pay { font-size: 11px; padding: 2px 7px; border-radius: 4px; font-weight: 600; }
+.pay.ok  { background: rgba(52,199,89,.1);  color: var(--tint-green); }
+.pay.no  { background: rgba(255,59,48,.08); color: var(--tint-red); }
+.pay.idk { background: rgba(255,149,0,.1);  color: var(--tint-orange); }
+
+.links { display: flex; gap: 8px; margin-top: 10px; flex-wrap: wrap; }
+.btn {
+  display: inline-flex; align-items: center; gap: 4px;
+  padding: 8px 14px; border-radius: var(--radius-sm);
+  font-size: 13px; font-weight: 600; border: none; cursor: pointer;
+  text-decoration: none !important; transition: filter .2s;
+}
+.btn:active { filter: brightness(.9); }
+.btn.nav    { background: var(--accent); color: #fff; }
+.btn.xhs    { background: #ff2442; color: #fff; }
+.btn.dp     { background: #ffa700; color: #fff; }
+.btn.rsv    { background: var(--tint-green); color: #fff; }
+
+.as-overlay {
+  position: fixed; inset: 0; z-index: 9999;
+  background: rgba(0,0,0,.35); backdrop-filter: blur(2px);
+  display: flex; align-items: flex-end; justify-content: center;
+  opacity: 0; pointer-events: none; transition: opacity .25s;
+}
+.as-overlay.show { opacity: 1; pointer-events: auto; }
+.as-sheet {
+  width: 100%; max-width: 420px;
+  padding: 0 8px 34px;
+  transform: translateY(100%); transition: transform .3s cubic-bezier(.22,1,.36,1);
+}
+.as-overlay.show .as-sheet { transform: translateY(0); }
+.as-group {
+  background: rgba(255,255,255,.88); backdrop-filter: blur(20px);
+  border-radius: 14px; overflow: hidden; margin-bottom: 8px;
+}
+.as-group .as-item {
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+  padding: 16px; font-size: 18px; color: #007aff; font-weight: 500;
+  border: none; background: none; width: 100%; cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+.as-group .as-item + .as-item { border-top: .5px solid rgba(0,0,0,.12); }
+.as-group .as-item:active { background: rgba(0,0,0,.06); }
+.as-cancel { font-weight: 600; }
+
+.details {
+  margin-top: 10px; padding-top: 10px;
+  border-top: .5px solid var(--separator);
+  font-size: 13px; color: var(--text-secondary); line-height: 1.6;
+}
+.details.closed { display: none; }
+
+.day-list .card { margin-bottom: 8px; }
+.day-list .card .dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 6px; }
+
+.pay-summary { background: var(--bg-elevated); border-radius: var(--radius-md); padding: 14px 16px; box-shadow: var(--shadow-sm); font-size: 13px; line-height: 1.7; margin-bottom: 10px; }
+.pay-summary h4 { font-size: 14px; font-weight: 700; margin-bottom: 4px; }
+.pay-summary .warn { color: var(--tint-red); }
+.pay-summary .ok-text { color: var(--tint-green); }
+
+.legend { display: flex; gap: 14px; flex-wrap: wrap; padding: 8px 0; font-size: 12px; color: var(--text-secondary); }
+.legend-item { display: flex; align-items: center; gap: 5px; }
+.legend-dot { width: 8px; height: 8px; border-radius: 50%; }
+
+.leaflet-popup-content-wrapper { border-radius: var(--radius-md) !important; box-shadow: var(--shadow-lg) !important; font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif !important; }
+.leaflet-popup-content { font-size: 14px !important; line-height: 1.5 !important; margin: 12px 14px !important; }
+.leaflet-popup-content a { color: var(--accent) !important; }
+.leaflet-popup-tip { background: #fff !important; }
+.leaflet-control-zoom a { width: 34px !important; height: 34px !important; line-height: 34px !important; font-size: 16px !important; border-radius: 10px !important; background: rgba(255,255,255,.85) !important; -webkit-backdrop-filter: blur(10px) !important; backdrop-filter: blur(10px) !important; border: .5px solid var(--separator) !important; color: var(--text-primary) !important; }
+.leaflet-control-zoom { border-radius: 12px !important; overflow: hidden; box-shadow: var(--shadow-md) !important; border: none !important; }
+.leaflet-control-attribution { font-size: 9px !important; opacity: .5; }
+</style>
+</head>
+<body>
+
+<div id="map"></div>
+<div class="tabs" id="tabs"></div>
+<div class="content" id="content"></div>
+
+<script>
+// ╔══════════════════════════════════════════════════════════════╗
+// ║  DATA — Bangkok + Phuket 8-Day Trip                        ║
+// ╚══════════════════════════════════════════════════════════════╝
+
+const HOTEL = { name: '曼谷素坤逸20号万怡酒店', lat: 13.7360, lng: 100.5590 };
+
+const DAYS = [
+  { id: 0, label: '总览', color: '#0071e3', locations: [] },
+
+  // ═══ Day 1: 落地曼谷 ═══
+  { id: 1, label: 'D1', date: '9月22日 周二', title: '福州 → 曼谷 · 落地轻手', color: '#ff9500', locations: [
+    { name: '福州长乐机场', lat: 25.9350, lng: 119.6630, type: 'transport', time: '09:00', desc: '提前2小时到，春秋航空值机柜台',
+      gmap: '福州长乐国际机场' },
+    { name: '春秋 9C7301 · 福州→曼谷', lat: 17.5000, lng: 108.5000, type: 'transport', time: '11:25–15:15', desc: '直飞3h40m，含餐需另购，周二/四/六执飞',
+      budget: '¥1,000/人', gmap: '福州飞曼谷航班', detail: '福州长乐机场 (FOC) → 曼谷素万那普机场 (BKK)\n春秋航空 9C7301\n空客A320，飞行时间约3小时40分钟\n9月22日（周二）有航班' },
+    { name: '素万那普机场 (BKK)', lat: 13.6900, lng: 100.7501, type: 'transport', time: '15:15', desc: '落地，Grab打车去酒店约300-400泰铢，40分钟',
+      pay: { cash: 1 }, gmap: 'Suvarnabhumi Airport Bangkok' },
+    { name: '曼谷素坤逸20号万怡酒店', lat: 13.7360, lng: 100.5590, type: 'hotel', time: '17:00',
+      desc: '四星，屋顶泳池，步行10分钟到BTS Asok，Terminal 21对面', budget: '¥500/晚（两人）',
+      xhsKeyword: '曼谷素坤逸万怡酒店 体验', gmap: 'Courtyard by Marriott Bangkok Sukhumvit 20',
+      detail: 'Courtyard by Marriott Bangkok Sukhumvit 20\n📍 Soi Sukhumvit 20, Khlong Toei\n🚇 步行10分钟到BTS Asok站\n🏊 屋顶泳池、健身中心\n🛏️ 现代装修，房间25-30㎡\n⭐ Booking评分8.5+' },
+    { name: 'Jodd Fairs 乔德夜市', lat: 13.7520, lng: 100.5650, type: 'food', time: '18:30', desc: '白色帐篷网红夜市，火山排骨+水果西施冰沙+手打猪肉丸',
+      budget: '¥60-100/人', pay: { cash: 1 }, xhsKeyword: 'Jodd Fairs 曼谷 2025',
+      gmap: 'Jodd Fairs Night Market Bangkok', detail: '🚇 MRT Phra Ram 9站2号出口\n🕐 16:00–00:00\n🌋 必吃：火山排骨(M号~500泰铢)、水果西施西瓜冰沙\n🍢 手打猪肉丸、迷你海鲜煎饼\n⚠️ 只收现金，带20/100泰铢零钱\n💡 建议17:00前到避开高峰' }
+  ]},
+
+  // ═══ Day 2: 暹罗商圈 ═══
+  { id: 2, label: 'D2', date: '9月23日 周三', title: '曼谷 · 暹罗商圈', color: '#007aff', locations: [
+    { name: 'Siam Paragon', lat: 13.7465, lng: 100.5350, type: 'spot', time: '10:00', desc: '暹罗百丽宫，地下美食广场超大，G层有food court',
+      xhsKeyword: 'Siam Paragon 曼谷 美食 2025', gmap: 'Siam Paragon Bangkok' },
+    { name: 'CentralWorld', lat: 13.7469, lng: 100.5393, type: 'spot', time: '11:30', desc: '东南亚最大商场之一，对面就是四面佛',
+      gmap: 'CentralWorld Bangkok' },
+    { name: 'Inter Restaurant', lat: 13.7450, lng: 100.5365, type: 'food', time: '12:30', desc: '老牌泰餐食堂，泰式炒粉+打抛饭+冬阴功，便宜好吃',
+      budget: '¥30-50/人', pay: { cash: 1, card: 0.5 }, xhsKeyword: 'Inter Restaurant 曼谷 暹罗',
+      gmap: 'Inter Restaurant Siam Square Bangkok', detail: '📍 Siam Square Soi 9\n🍜 招牌：Pad Thai、打抛猪肉饭、冬阴功\n💰 人均150-200泰铢\n⭐ 本地人和游客都爱，饭点需排队15-20分钟' },
+    { name: '四面佛 (Erawan Shrine)', lat: 13.7445, lng: 100.5407, type: 'spot', time: '14:00', desc: '路过拍照即可，不进庙',
+      gmap: 'Erawan Shrine Bangkok' },
+    { name: 'Yaowarat 唐人街夜市', lat: 13.7405, lng: 100.5100, type: 'food', time: '18:00', desc: '霓虹灯港风街拍+燕窝糖水+咖喱蟹+烤鱿鱼，周二至周日',
+      budget: '¥60-100/人', pay: { cash: 1 }, xhsKeyword: '曼谷唐人街 耀华力路 美食 2025',
+      gmap: 'Yaowarat Road Chinatown Bangkok', detail: '🚇 MRT Wat Mangkon站1号出口\n🕐 周二至周日 16:00–22:00\n🧊 燕窝糖水~50泰铢\n🦀 泰式咖喱蟹、大蟹肉卷\n🍢 烤鱿鱼甜辣酱\n⚠️ 人潮拥挤，建议17:00到' }
+  ]},
+
+  // ═══ Day 3: 素坤逸+SPA ═══
+  { id: 3, label: 'D3', date: '9月24日 周四', title: '曼谷 · 素坤逸深度 + SPA', color: '#af52de', locations: [
+    { name: 'Emsphere + EmQuartier', lat: 13.7300, lng: 100.5690, type: 'spot', time: '10:00', desc: 'Phrom Phong新商场群，设计感强，Emsphere有网红美食层',
+      xhsKeyword: 'Emsphere 曼谷 2025 美食', gmap: 'Emsphere Bangkok' },
+    { name: 'The Commons Thonglor', lat: 13.7340, lng: 100.5790, type: 'food', time: '12:00', desc: '社区型美食空间，Roast早午餐/各式小店，文艺范',
+      budget: '¥60-80/人', pay: { cash: 0.5, card: 1 }, xhsKeyword: 'The Commons 通罗 曼谷 美食',
+      gmap: 'The Commons Thonglor Bangkok', detail: '📍 Thonglor Soi 17\n🌿 开放式垂直社区空间\n🍳 Roast Coffee: 招牌早午餐\n☕ 多家精品咖啡馆和甜品店\n💳 大部分店可刷卡' },
+    { name: 'Health Land SPA (Asoke)', lat: 13.7400, lng: 100.5580, type: 'spot', time: '13:30', desc: '传统泰式按摩2小时~650泰铢，提前一天官网预约',
+      budget: '¥130/人', pay: { cash: 1, card: 1 }, reserve: 'https://healthland.co.th',
+      xhsKeyword: 'Health Land 曼谷 Asoke 体验', gmap: 'Health Land Asoke Bangkok',
+      detail: '📍 55/5 Sukhumvit 21 Soi Asoke\n🕐 9:00–24:00\n💆 传统泰式按摩 2h ~650泰铢\n📅 提前一天在 healthland.co.th 预约\n🚇 BTS Asok / MRT Sukhumvit 步行5分钟' },
+    { name: 'Asiatique 河滨夜市', lat: 13.7030, lng: 100.4900, type: 'food', time: '18:30', desc: '河边仓库改造，摩天轮+餐厅+小店，BTS到Saphan Taksin转免费船',
+      budget: '¥60-100/人', pay: { cash: 1, card: 0.5 }, xhsKeyword: 'Asiatique 曼谷 河滨夜市',
+      gmap: 'Asiatique The Riverfront Bangkok', detail: '🚇 BTS Saphan Taksin站→免费接驳船\n🕐 17:00–00:00\n🎡 河滨摩天轮（拍照>乘坐）\n🍜 河边餐厅、泰餐、海鲜\n🛍️ 伴手礼、手工艺品\n💡 傍晚去最好，日落+夜景' }
+  ]},
+
+  // ═══ Day 4: 飞普吉 ═══
+  { id: 4, label: 'D4', date: '9月25日 周五', title: '曼谷 → 普吉 · 转场+沙滩日落', color: '#34c759', locations: [
+    { name: '曼谷→普吉 (亚航/狮航)', lat: 10.0000, lng: 100.0000, type: 'transport', time: '10:00–11:30', desc: 'DMK→HKT，直飞1.5h，单程~200-300元',
+      budget: '¥200-300/人', gmap: '曼谷飞普吉岛航班', detail: '从廊曼机场 (DMK) 出发\n亚洲航空或泰狮航\n飞行时间约1小时20-30分钟\n建议提前2-3周订票\n9月淡季价格较低' },
+    { name: '普吉国际机场 (HKT)', lat: 8.1132, lng: 98.3169, type: 'transport', time: '11:30', desc: '落地，Grab去卡伦海滩约1小时，600-800泰铢',
+      pay: { cash: 1 }, gmap: 'Phuket International Airport' },
+    { name: 'Avista Grande Karon · MGallery', lat: 7.8470, lng: 98.2950, type: 'hotel', time: '13:00', desc: '美憬阁，出门步行几分钟到卡伦海滩，艺术感设计，双泳池',
+      budget: '¥700/晚（两人）', xhsKeyword: 'Avista Grande Karon 普吉 体验', gmap: 'Avista Grande Phuket Karon MGallery',
+      detail: 'Avista Grande Phuket Karon - MGallery\n📍 卡伦海滩路，步行3分钟到沙滩\n🏊 两个泳池，拍照出片\n🛏️ 房间新、不潮湿（泰国海边难得）\n⭐ 服务好，前台送客到房间讲解\n⚠️ 早餐普通，自备牙刷' },
+    { name: '卡伦海滩', lat: 7.8440, lng: 98.2940, type: 'spot', time: '15:00', desc: '普吉最长海滩之一，沙细浪大，适合放空躺平，比芭东安静',
+      gmap: 'Karon Beach Phuket' },
+    { name: 'Karon On the Hill', lat: 7.8420, lng: 98.2930, type: 'food', time: '18:00', desc: '正对卡伦海滩日落，菠萝饭150泰铢，饮料几十泰铢，性价比绝了',
+      budget: '¥30-50/人', pay: { cash: 1 }, xhsKeyword: 'Karon On the Hill 普吉 日落', gmap: 'Karon On the Hill Phuket' }
+  ]},
+
+  // ═══ Day 5: 出海日 ═══
+  { id: 5, label: 'D5', date: '9月26日 周六', title: '普吉 · 皇帝岛浮潜 🤿 + 海豚 🐬', color: '#0071e3', locations: [
+    { name: '查龙码头 (Chalong Pier)', lat: 7.8210, lng: 98.3400, type: 'transport', time: '08:00', desc: '出海出发点，含酒店接送，Grab约30分钟',
+      gmap: 'Chalong Pier Phuket' },
+    { name: 'Raya Island 皇帝岛浮潜', lat: 7.6050, lng: 98.3700, type: 'spot', time: '09:00–12:00', desc: '快艇30分钟，Kon Kare Bay浮潜，鱼多水清，能见度最高时段',
+      budget: '¥160-300/人', reserve: 'https://www.klook.com/zh-CN/activity/51166-racha-coral-island-trip-phuket/',
+      xhsKeyword: '普吉皇帝岛 浮潜 体验 攻略', gmap: 'Racha Yai Island Phuket',
+      detail: '⛵ 查龙码头出发，快艇25-30分钟\n🐠 Kon Kare Bay: 最佳浮潜点，鱼群多\n🤿 浮潜时间约1.5小时，含装备\n🍱 一日游含自助午餐\n⚠️ 9月雨季，风浪可能偏大，带晕船药\n📅 建议提前在KKday/Klook预订' },
+    { name: 'Maithon Island 海豚追踪', lat: 7.7700, lng: 98.4250, type: 'spot', time: '12:30–15:00', desc: '环岛巡游追踪野生海豚，不能保证100%看到，含浮潜',
+      budget: '¥500-680/人', xhsKeyword: '普吉岛海豚 Maithon 出海', gmap: 'Maithon Island Phuket',
+      detail: '🐬 梅顿岛（Maithon Island）又名"海豚岛"\n🌊 野生海豚出没概率约60-70%\n🤿 包含浮潜环节\n🕐 全天8小时含午餐\n💰 $72-94/人（约500-680元）\n⚠️ 9月季风季取消概率40-50%，看清退改政策\n📅 KKday/GetYourGuide可订' },
+    { name: 'One Chun 普吉老镇', lat: 7.8855, lng: 98.3900, type: 'food', time: '—', desc: 'Plan B备选：米其林推荐，招牌红烧肉+咖喱椰奶蟹肉粉+泰奶',
+      budget: '¥60-80/人', pay: { cash: 1 }, xhsKeyword: 'One Chun 普吉镇 米其林', gmap: 'One Chun Phuket Old Town' },
+    { name: '尼莫海豚馆 Dolphins Bay', lat: 7.8220, lng: 98.3420, type: 'spot', time: '—', desc: 'Plan B备选：海豚表演14:00场，门票~130元，周一闭馆',
+      budget: '¥130/人', xhsKeyword: '尼莫海豚馆 普吉 2025', gmap: 'Dolphins Bay Phuket',
+      detail: '📍 33/50 M.2 Soi Pa Lai 2, Chalong\n🕐 周二至周日 09:00–18:00\n⚠️ 周一闭馆！\n🎪 表演：11:00 / 14:00 / 17:00\n💺 前两排会被溅湿' },
+    { name: 'Tann Terrace Beach Club', lat: 7.8430, lng: 98.2930, type: 'drink', time: '19:00', desc: '卡伦海滩火舞秀19:00/21:00各一场，需低消3000泰铢/桌',
+      budget: '¥120-200/人', pay: { cash: 0.5, card: 1 }, xhsKeyword: 'Tann Terrace 普吉 火舞',
+      gmap: 'Tann Terrace Beach Club Phuket', detail: '🔥 每晚19:00和21:00火舞表演\n🍹 鸡尾酒+泰餐\n💺 沙滩位3000泰铢低消/2人\n🌅 建议18:30到，看日落+等火舞' },
+    { name: 'Tunk Ka Cafe', lat: 7.8860, lng: 98.3830, type: 'drink', time: '—', desc: 'Plan B备选：Khao Rang山顶俯瞰普吉镇全景，蟹肉咖喱+夕阳',
+      budget: '¥30-60/人', pay: { cash: 1 }, xhsKeyword: 'Tunk Ka Cafe 普吉 山顶', gmap: 'Tunk Ka Cafe Phuket' }
+  ]},
+
+  // ═══ Day 6: 海滩日 ═══
+  { id: 6, label: 'D6', date: '9月27日 周日', title: '普吉 · 卡伦卡塔海滩日', color: '#ff9f0a', locations: [
+    { name: '卡塔海滩', lat: 7.8210, lng: 98.3000, type: 'spot', time: '11:00', desc: '比卡伦更安静，两个海湾组成，水清适合游泳，沙滩躺平',
+      gmap: 'Kata Beach Phuket' },
+    { name: 'Red Corner 卡塔', lat: 7.8220, lng: 98.3020, type: 'food', time: '13:00', desc: '卡塔老网红店，泰式炒粉+烤猪颈肉必点，性价比之王',
+      budget: '¥40-60/人', pay: { cash: 1 }, xhsKeyword: 'Red Corner 普吉 卡塔 餐厅', gmap: 'Red Corner Kata Phuket' },
+    { name: 'On the Hill 悬崖咖啡', lat: 7.8420, lng: 98.2930, type: 'drink', time: '14:30', desc: '正对卡伦海滩，视野绝佳，饮料几十泰铢，白色阶梯直通沙滩',
+      budget: '¥10-20', pay: { cash: 1 }, xhsKeyword: 'On the Hill 普吉 悬崖咖啡 卡伦',
+      gmap: 'Karon On the Hill Phuket', detail: '⚠️ 注意：Laem Sai Cup Cafe 周日休息，别跑空\n☕ On the Hill 是平替，同样正对卡伦海滩\n🥤 饮料50-80泰铢\n🍍 菠萝饭150泰铢\n🪜 白色阶梯通往沙滩' },
+    { name: 'The Sundeck by Katathani', lat: 7.8120, lng: 98.3050, type: 'drink', time: '17:00', desc: '270°玻璃观景台日落，白色地中海风格，人均400-600泰铢',
+      budget: '¥80-120/人', pay: { cash: 0.5, card: 1 }, xhsKeyword: 'The Sundeck 普吉 日落 卡塔',
+      gmap: 'The Sundeck by Katathani Phuket', detail: '🌅 270°玻璃观景台俯瞰卡塔湾\n🕐 建议16:30前到占好位\n🍹 蝶豆花椰子冰沙、火山熔岩巧克力\n💰 人均400-600泰铢\n📸 ins风白色地中海建筑' },
+    { name: 'RUBO 卡塔', lat: 7.8215, lng: 98.3015, type: 'food', time: '19:00', desc: '蟹肉炒饭份量超足，此行米饭类最满意的一家',
+      budget: '¥40-60/人', pay: { cash: 1 }, xhsKeyword: 'RUBO 普吉 卡塔 蟹肉炒饭', gmap: 'RUBO Kata Phuket' }
+  ]},
+
+  // ═══ Day 7: 老镇+最后采购 ═══
+  { id: 7, label: 'D7', date: '9月28日 周一', title: '普吉 · 老镇深度 + 海鲜大餐', color: '#ff375f', locations: [
+    { name: '普吉老镇 Old Town', lat: 7.8850, lng: 98.3900, type: 'spot', time: '10:30', desc: 'Soi Romanee巷+Thalang Road彩色骑楼，中国+葡萄牙混合建筑',
+      xhsKeyword: '普吉老镇 彩色骑楼 拍照 攻略', gmap: 'Phuket Old Town' },
+    { name: 'Maa Mas 普吉镇', lat: 7.8860, lng: 98.3920, type: 'food', time: '13:00', desc: '装修像西餐厅的泰餐，甘蔗虾+越南春卷+冬阴功炒饭+泰奶',
+      budget: '¥50-80/人', pay: { cash: 1, card: 0.5 }, xhsKeyword: 'Maa Mas 普吉 餐厅', gmap: 'Maa Mas Phuket' },
+    { name: '班赞海鲜市场 Banzaan', lat: 7.8910, lng: 98.2970, type: 'food', time: '16:00', desc: '芭东区，一楼买海鲜（往3折砍），二楼加工，人均300-500泰铢',
+      budget: '¥60-100/人', pay: { cash: 1 }, xhsKeyword: '班赞海鲜市场 砍价 攻略 普吉',
+      gmap: 'Banzaan Fresh Market Patong Phuket', detail: '🦞 一楼：买活海鲜，记得往3折砍\n🍳 二楼：加工厨房，广东厨房/Your Kitchen口碑好\n💰 海鲜+加工人均300-500泰铢\n⚠️ 只收现金\n💡 下午4点去，海鲜还新鲜，人也不多' },
+    { name: 'A Blanket & A Pillow', lat: 7.8250, lng: 98.3030, type: 'drink', time: '17:00', desc: '⚠️ 周一休息，换On the Hill或酒店沙滩看最后一场安达曼海日落',
+      budget: '¥10-30', pay: { cash: 1 }, gmap: 'A Blanket and A Pillow Kata Phuket', detail: '⚠️ 周一休息！\n🔄 备选：On the Hill（每日营业）或酒店沙滩\n🌅 最后一场安达曼海日落' },
+    { name: 'Let\'s Relax SPA (卡伦)', lat: 7.8450, lng: 98.2940, type: 'spot', time: '19:00', desc: '泰国连锁SPA品牌，传统泰式+精油按摩，最后放松一把',
+      budget: '¥200-300/人', pay: { card: 1, cash: 0.5 }, reserve: 'https://www.letsrelaxspa.com',
+      xhsKeyword: 'Let\'s Relax SPA 普吉 卡伦', gmap: 'Let\'s Relax Spa Karon Phuket',
+      detail: '💆 泰国知名连锁SPA品牌\n🧖 推荐：传统泰式+热油按摩 2h\n💰 约1000-1500泰铢\n📅 建议提前一天预约\n⭐ 比街边小店贵但品质稳定' }
+  ]},
+
+  // ═══ Day 8: 返程 ═══
+  { id: 8, label: 'D8', date: '9月29日 周二', title: '普吉 → 福州 · 返程', color: '#8e8e93', locations: [
+    { name: '酒店早餐+退房', lat: 7.8470, lng: 98.2950, type: 'hotel', time: '09:00', desc: '享受最后半天，泳池/沙滩最后走走',
+      gmap: 'Avista Grande Karon Phuket' },
+    { name: '普吉国际机场', lat: 8.1132, lng: 98.3169, type: 'transport', time: '11:00', desc: 'Grab从酒店约1小时，普吉→曼谷早班机',
+      pay: { cash: 1 }, gmap: 'Phuket International Airport' },
+    { name: '普吉→曼谷 (国内段)', lat: 10.5000, lng: 99.0000, type: 'transport', time: '13:00–14:30', desc: 'HKT→DMK，亚航/狮航，1.5h',
+      budget: '¥200-300/人', gmap: '普吉飞曼谷航班' },
+    { name: '曼谷→福州 (春秋)', lat: 17.0000, lng: 105.0000, type: 'transport', time: '下午', desc: 'BKK→FOC，春秋航空，9/29周二有航班，晚间抵达福州',
+      budget: '¥1,000/人', gmap: '曼谷飞福州 春秋航空',
+      detail: '✈️ 返程建议：\n1. 普吉→曼谷早班机，曼谷→福州下午班机\n2. 同一航司或联盟留3h以上转机时间\n3. 也可直接搜「普吉→福州」联程票\n4. 9月29日是周二，春秋有曼谷→福州航班' },
+    { name: '福州长乐机场', lat: 25.9350, lng: 119.6630, type: 'transport', time: '晚间', desc: '🏠 到家！',
+      gmap: '福州长乐国际机场' }
+  ]}
+];
+
+// ╔══════════════════════════════════════════════════════════════╗
+// ║  OVERVIEW TAB                                               ║
+// ╚══════════════════════════════════════════════════════════════╝
+
+function overviewContent() {
+  return `
+<div class="hero">
+  <h1>🐘 曼谷+普吉岛 8天</h1>
+  <p class="subtitle">2026年9月22日—29日 · 福州出发 · 1-2人</p>
+</div>
+<div class="info-grid">
+  <div class="info-card"><div class="label">🏨 曼谷酒店</div><div class="value">素坤逸20号万怡酒店<br><span style="font-size:13px;color:#86868b">~¥500/晚·3晚</span></div></div>
+  <div class="info-card"><div class="label">🏨 普吉酒店</div><div class="value">Avista Grande Karon<br><span style="font-size:13px;color:#86868b">~¥700/晚·4晚</span></div></div>
+  <div class="info-card"><div class="label">✈️ 航班</div><div class="value">春秋+亚航/狮航<br><span style="font-size:13px;color:#86868b">四段人均¥2,600</span></div></div>
+  <div class="info-card"><div class="label">💳 人均预算</div><div class="value">~¥7,500<br><span style="font-size:13px;color:#34c759">含¥2,300购物空间</span></div></div>
+</div>
+<div class="section-head">行程概览</div>
+<div class="day-list">
+${DAYS.slice(1).map(d=>`<div class="card" onclick="go(${d.id})"><div class="name"><span class="dot" style="background:${d.color}"></span>${d.label} · ${d.title}</div><div class="desc">${d.date}</div></div>`).join('')}
+</div>
+
+<div class="section-head">⚠️ 天气提醒</div>
+<div class="pay-summary">
+  <h4>🌧️ 9月普吉岛雨季</h4>
+  <p>每天下午大概率阵雨，<span class="warn">户外活动尽量排上午</span>。出海看海豚/浮潜放Day 5，天气取消有Plan B（普吉老镇+海豚馆+SPA）。</p>
+</div>
+
+<div class="section-head">💴 支付提醒</div>
+<div class="pay-summary">
+  <h4>💰 泰国以现金为主</h4>
+  <p>夜市、小餐厅、路边摊<span class="warn">基本只收现金</span>，建议<span class="warn">每人换8,000-10,000泰铢</span>（约¥1,600-2,000）。</p>
+  <p style="margin-top:6px"><span class="ok-text">✅ 支付宝/微信：</span>商场、7-11、部分餐厅可用</p>
+  <p><span class="ok-text">✅ 信用卡：</span>酒店、连锁餐厅、SPA可用</p>
+</div>
+
+<div class="section-head">🗺️ 出行关键</div>
+<div class="pay-summary">
+  <p>🚕 <strong>Grab/Bolt</strong> 打车为主，曼谷BTS/MRT覆盖核心区</p>
+  <p>🌧️ 9月<strong>每天带伞</strong>，普吉下午大概率下雨</p>
+  <p>📅 <strong>提前订：</strong>Health Land SPA（提前1天）、海豚出海团（提前1周）、机票（提前2-4周）</p>
+  <p>🐬 <strong>浮潜+海豚：</strong>皇帝岛Raya Island浮潜（水清鱼多）+ Maithon岛追踪野生海豚</p>
+</div>
+
+<div class="section-head">图例</div>
+<div class="legend">
+  <div class="legend-item"><div class="legend-dot" style="background:var(--tint-red)"></div>餐厅</div>
+  <div class="legend-item"><div class="legend-dot" style="background:var(--tint-blue)"></div>景点/活动</div>
+  <div class="legend-item"><div class="legend-dot" style="background:var(--tint-purple)"></div>饮品/日落</div>
+  <div class="legend-item"><div class="legend-dot" style="background:var(--tint-orange)"></div>酒店</div>
+  <div class="legend-item"><div class="legend-dot" style="background:var(--text-tertiary)"></div>交通</div>
+</div>`;
+}
+
+// ╔══════════════════════════════════════════════════════════════╗
+// ║  ENGINE                                                     ║
+// ╚══════════════════════════════════════════════════════════════╝
+
+const map = L.map('map', { center: [HOTEL.lat || 13.74, HOTEL.lng || 100.56], zoom: 12, zoomControl: false, attributionControl: true });
+L.control.zoom({ position: 'topright' }).addTo(map);
+L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', { maxZoom: 19 }).addTo(map);
+
+/* ── Geolocation ── */
+const LocateControl = L.Control.extend({
+  options: { position: 'bottomright' },
+  onAdd() {
+    const btn = L.DomUtil.create('button', 'locate-btn');
+    btn.innerHTML = '📍';
+    btn.title = '我的位置';
+    L.DomEvent.disableClickPropagation(btn);
+    btn.addEventListener('click', () => {
+      btn.classList.add('active');
+      map.locate({ setView: true, maxZoom: 15 });
+    });
+    this._btn = btn;
+    return btn;
+  }
+});
+new LocateControl().addTo(map);
+let locMarker, locCircle;
+map.on('locationfound', e => {
+  const r = e.accuracy / 2;
+  if (locMarker) { locMarker.setLatLng(e.latlng); locCircle.setLatLng(e.latlng).setRadius(r); }
+  else {
+    locMarker = L.marker(e.latlng, {
+      icon: L.divIcon({ className:'', html:'<div style="width:14px;height:14px;border-radius:50%;background:#007aff;border:2.5px solid #fff;box-shadow:0 0 6px rgba(0,122,255,.5)"></div><div class="loc-pulse" style="position:absolute;top:0;left:0"></div>', iconSize:[14,14], iconAnchor:[7,7] }),
+      zIndexOffset: 2000
+    }).addTo(map);
+    locCircle = L.circle(e.latlng, { radius: r, color: '#007aff', fillColor: '#007aff', fillOpacity: .08, weight: 1 }).addTo(map);
+  }
+});
+map.on('locationerror', () => {});
+
+function icon(color, emoji) {
+  return L.divIcon({ className: '', html: `<div style="width:28px;height:28px;border-radius:50%;background:${color};border:2.5px solid #fff;display:flex;align-items:center;justify-content:center;font-size:13px;box-shadow:0 2px 8px rgba(0,0,0,.18)">${emoji||''}</div>`, iconSize: [28,28], iconAnchor: [14,14], popupAnchor: [0,-16] });
+}
+
+if (HOTEL.lat) L.marker([HOTEL.lat, HOTEL.lng], { icon: icon('#ff9500','🏨'), zIndexOffset: 1000 }).addTo(map).bindPopup(`<b>${HOTEL.name}</b>`);
+
+let markers = [], polylines = [];
+const emojis = { food:'🍽️', spot:'📍', hotel:'🏨', transport:'✈️', drink:'🍺' };
+
+function clearMap() { markers.forEach(m=>map.removeLayer(m)); polylines.forEach(p=>map.removeLayer(p)); markers=[]; polylines=[]; }
+
+function showDay(idx) {
+  clearMap();
+  if (idx === 0) {
+    const pts = [];
+    DAYS.forEach(d => d.locations.forEach(l => { if(l.lat) pts.push([l.lat,l.lng]); }));
+    if(pts.length) {
+      // For multi-city, use world view
+      const bounds = L.latLngBounds(pts);
+      map.fitBounds(bounds, {padding:[30,30], maxZoom: 6});
+    }
+    DAYS.slice(1).forEach(d => {
+      d.locations.filter(l=>l.time!=='—').forEach(l => {
+        const m = L.circleMarker([l.lat,l.lng], { radius:4, fillColor:d.color, color:'#fff', weight:1.5, fillOpacity:.9 }).addTo(map).bindPopup(`<b>${l.name}</b><br><span style="color:#86868b">${d.label} · ${d.title}</span>`);
+        markers.push(m);
+      });
+    });
+    return;
+  }
+  const day = DAYS.find(d=>d.id===idx);
+  if(!day) return;
+  const coords = [];
+  day.locations.forEach(l => {
+    if(!l.lat) return;
+    const m = L.marker([l.lat,l.lng], { icon: icon(day.color, emojis[l.type]||'📌') }).addTo(map);
+    const gmapQ = l.gmap||encodeURIComponent(l.name+' Thailand');
+    m.bindPopup(`<b>${l.name}</b>${l.time!=='—'?'<br><span style="color:#86868b">'+l.time+'</span>':''}<br>${l.desc}${l.budget?'<br><span style="color:#ff9500">'+l.budget+'</span>':''}<br><a href="#" onclick="event.preventDefault();openAS('${l.name.replace(/'/g,"\\'")}',${l.lat},${l.lng},'${gmapQ}')">📍 导航</a>${l.xhs?' · <a href="'+l.xhs+'" target="_blank">📕 小红书</a>':''}`);
+    markers.push(m);
+    if(l.time!=='—') coords.push([l.lat,l.lng]);
+  });
+  if(coords.length>1) { const pl = L.polyline(coords, { color:day.color, weight:2.5, opacity:.5, dashArray:'6,5' }).addTo(map); polylines.push(pl); }
+  if(coords.length) map.fitBounds(coords, { padding:[40,40], maxZoom:13 });
+}
+
+// ══════════ RENDER ══════════
+function payChips(pay) {
+  if(!pay) return '';
+  let h = '<div class="pays">';
+  const m = { cash:'💴现金', card:'💳刷卡', alipay:'支付宝', wechat:'微信' };
+  for(const [k,label] of Object.entries(m)) {
+    if(pay[k]!==undefined) { const c = pay[k]===1?'ok':pay[k]===0.5?'idk':'no'; h += `<span class="pay ${c}">${label}</span>`; }
+  }
+  return h+'</div>';
+}
+
+const IN_APP_WEBVIEW = (() => {
+  const ua = (navigator.userAgent || '').toLowerCase();
+  return /micromessenger|xhs|xhsdiscover|discover\/|tiktok|aweme|weibo|qq\/|qqbrowser|alipayclient|dingtalk|lark|feishu|ucbrowser|baiduboxapp|toutiao|newsarticle/.test(ua);
+})();
+
+function xhsKeyword(loc) {
+  if(loc.xhsKeyword) return loc.xhsKeyword.trim();
+  return (loc.name||'').replace(/⭐.*$/g,'').replace(/（.*?）/g,'').replace(/\(.*?\)/g,'').replace(/\s+/g,' ').trim();
+}
+function xhsAppUrl(loc) { return `xhsdiscover://search/result?keyword=${encodeURIComponent(xhsKeyword(loc))}&target_search=notes&source=deeplink`; }
+function xhsWebUrl(loc) { return `https://www.xiaohongshu.com/search_result?keyword=${encodeURIComponent(xhsKeyword(loc))}&source=web_explore_feed`; }
+
+function dpKeyword(loc) {
+  if(loc.dianpingKeyword) return loc.dianpingKeyword.trim();
+  return (loc.name||'').replace(/⭐.*$/g,'').replace(/（.*?）/g,'').replace(/\(.*?\)/g,'').replace(/\s+/g,' ').trim();
+}
+function dpAppUrl(loc) { return `dianping://searchshoplist?keyword=${encodeURIComponent(dpKeyword(loc))}`; }
+function dpWebUrl(loc) { return `https://m.dianping.com/searchshop?keyword=${encodeURIComponent(dpKeyword(loc))}`; }
+
+window._extLocs = {};
+DAYS.forEach(d => d.locations.forEach(l => { window._extLocs[`${d.id}::${l.name}`] = l; }));
+window._xhsLocs = window._extLocs;
+
+function openExt(key, kind) {
+  const loc = window._extLocs[key]; if(!loc) return false;
+  if (IN_APP_WEBVIEW) {
+    window.location.href = kind==='dp' ? dpWebUrl(loc) : xhsWebUrl(loc);
+  } else {
+    window.location.href = kind==='dp' ? dpAppUrl(loc) : xhsAppUrl(loc);
+  }
+  return false;
+}
+function openXhs(key) { return openExt(key, 'xhs'); }
+function openDp(key)  { return openExt(key, 'dp'); }
+
+function locCard(loc, dayIdx) {
+  const dot = loc.type==='food'?'food':loc.type==='spot'?'spot':loc.type==='drink'?'drink':loc.type==='hotel'?'hotel':'transport';
+  const bdg = loc.type==='food'?'<span class="badge food">餐</span>':loc.type==='spot'?'<span class="badge spot">景</span>':loc.type==='drink'?'<span class="badge drink">饮</span>':'';
+  const uid = `d${dayIdx}-${loc.name.replace(/\W/g,'')}`;
+  const locKey = `${dayIdx}::${loc.name}`;
+  const gmapQ = loc.gmap||encodeURIComponent(loc.name+' Thailand');
+  let lnk = `<button class="btn nav" onclick="openAS('${loc.name.replace(/'/g,"\\'")}',${loc.lat},${loc.lng},'${gmapQ}')">📍 导航</button>`;
+  if(loc.xhs||loc.xhsKeyword) {
+    const xhsHref = IN_APP_WEBVIEW ? xhsWebUrl(loc) : xhsAppUrl(loc);
+    const xhsLabel = IN_APP_WEBVIEW ? '📕 小红书' : '📕 小红书 App';
+    lnk += `<a href="${xhsHref}" onclick="return openXhs('${locKey.replace(/'/g,"\\'")}')" class="btn xhs">${xhsLabel}</a>`;
+  }
+  const dpEnabled = loc.dianping !== false &&
+    (loc.dianping || loc.dianpingKeyword || loc.type==='food' || loc.type==='drink');
+  if(dpEnabled) {
+    const dpHref = IN_APP_WEBVIEW ? dpWebUrl(loc) : dpAppUrl(loc);
+    const dpLabel = IN_APP_WEBVIEW ? '🍜 大众点评' : '🍜 大众点评 App';
+    lnk += `<a href="${dpHref}" onclick="return openDp('${locKey.replace(/'/g,"\\'")}')" class="btn dp">${dpLabel}</a>`;
+  }
+  if(loc.reserve) lnk += `<a href="${loc.reserve}" target="_blank" class="btn rsv">📅 预约</a>`;
+  return `<div class="tl-item"><div class="tl-dot ${dot}"></div><div class="card" onclick="if(!event.target.closest('.btn,.links'))toggle('${uid}')"><div class="time">${loc.time!=='—'?loc.time:'备选'}</div><div class="name">${bdg} ${loc.name}</div><div class="desc">${loc.desc}</div>${loc.budget?'<div class="budget">'+loc.budget+'</div>':''}${payChips(loc.pay)}<div class="links">${lnk}</div>${loc.detail?'<div class="details" id="'+uid+'">'+loc.detail.replace(/\n/g,'<br>')+'</div>':''}</div></div>`;
+}
+
+function renderDay(idx) {
+  const d = DAYS.find(x=>x.id===idx); if(!d) return '';
+  const main = d.locations.filter(l=>l.time!=='—');
+  const alt = d.locations.filter(l=>l.time==='—');
+  let h = `<div class="day-head"><h2>${d.title}</h2><p>${d.date}</p></div>`;
+  if(main.length) { h += '<div class="section-head">行程</div><div class="timeline">'; main.forEach(l => h += locCard(l, idx)); h += '</div>'; }
+  if(alt.length) { h += '<div class="section-head">备选 (天气/时间原因切换)</div><div class="timeline">'; alt.forEach(l => h += locCard(l, idx)); h += '</div>'; }
+  return h;
+}
+
+// ══════════ NAV ══════════
+let cur = 0;
+const tabsEl = document.getElementById('tabs');
+const contentEl = document.getElementById('content');
+
+DAYS.forEach(d => {
+  const btn = document.createElement('button');
+  btn.className = 'tab' + (d.id===0?' active':'');
+  btn.dataset.day = d.id;
+  btn.textContent = d.label;
+  tabsEl.appendChild(btn);
+});
+
+function go(idx) {
+  cur = idx;
+  tabsEl.querySelectorAll('.tab').forEach(t => t.classList.toggle('active', +t.dataset.day===idx));
+  contentEl.innerHTML = idx===0 ? overviewContent() : renderDay(idx);
+  showDay(idx);
+  contentEl.scrollTo({top:0});
+  const tab = tabsEl.querySelector(`[data-day="${idx}"]`);
+  if(tab) tab.scrollIntoView({behavior:'smooth', inline:'center', block:'nearest'});
+}
+
+function toggle(id) { const el=document.getElementById(id); if(el) el.classList.toggle('closed'); }
+
+tabsEl.addEventListener('click', e => { const t=e.target.closest('.tab'); if(t) go(+t.dataset.day); });
+
+go(0);
+
+/* ── Action Sheet for Navigation ── */
+const asOverlay = document.createElement('div');
+asOverlay.className = 'as-overlay';
+asOverlay.innerHTML = `<div class="as-sheet">
+  <div class="as-group" id="as-opts"></div>
+  <div class="as-group"><button class="as-item as-cancel" onclick="closeAS()">取消</button></div>
+</div>`;
+document.body.appendChild(asOverlay);
+asOverlay.addEventListener('click', e => { if (e.target === asOverlay) closeAS(); });
+
+const IS_IOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+function amapAppUrl(name, lat, lng) {
+  const scheme = IS_IOS ? 'iosamap' : 'androidamap';
+  return `${scheme}://viewMap?sourceApplication=trip&poiname=${encodeURIComponent(name)}&lat=${lat}&lon=${lng}&dev=0`;
+}
+function amapWebUrl(name, lat, lng) {
+  return `https://uri.amap.com/marker?position=${lng},${lat}&name=${encodeURIComponent(name)}&src=trip&coordinate=wgs84&callnative=1`;
+}
+function openAmap(name, lat, lng) {
+  if (IN_APP_WEBVIEW) { window.open(amapWebUrl(name, lat, lng)); return; }
+  window.location.href = amapAppUrl(name, lat, lng);
+}
+
+function openAS(name, lat, lng, gmap) {
+  const q = gmap || encodeURIComponent(name + ' Thailand');
+  const encName = encodeURIComponent(name);
+  const safeName = name.replace(/'/g,"\\'");
+  const appleUrl = IN_APP_WEBVIEW
+    ? `https://maps.apple.com/?q=${lat},${lng}&ll=${lat},${lng}&name=${encName}`
+    : `maps://maps.apple.com/?q=${lat},${lng}&name=${encName}`;
+  const googleUrl = `https://www.google.com/maps/search/?api=1&query=${q}`;
+  document.getElementById('as-opts').innerHTML =
+    `<button class="as-item" onclick="window.open('${appleUrl}');closeAS()">🍎 Apple Maps</button>` +
+    `<button class="as-item" onclick="window.open('${googleUrl}');closeAS()">🗺️ Google Maps</button>` +
+    `<button class="as-item" onclick="openAmap('${safeName}',${lat},${lng});closeAS()">🧭 高德地图 App</button>`;
+  asOverlay.classList.add('show');
+}
+function closeAS() { asOverlay.classList.remove('show'); }
+</script>
+</body>
+</html>
