@@ -238,23 +238,28 @@ const DAYS = [
   ]},
 
   // ═══ Day 2: 暹罗商圈 ═══
-  { id: 2, label: 'D2', date: '9月23日 周三', title: '曼谷 · 暹罗商圈', color: '#007aff', locations: [
+  { id: 2, label: 'D2', date: '9月23日 周三', title: '曼谷 · 四面佛+暹罗商圈+玻璃天桥', color: '#007aff', locations: [
+    { name: '四面佛 (Erawan Shrine)', lat: 13.7445, lng: 100.5407, type: 'spot', time: '09:30', desc: '曼谷香火最旺，早上人少些，门口拍照+外围看看即可，不进庙',
+      xhsKeyword: '四面佛 曼谷 参拜 攻略', gmap: 'Erawan Shrine Bangkok',
+      detail: '📍 BTS Chit Lom站步行3分钟\n🕐 06:00–23:00\n💡 早上人少，适合拍照\n⚠️ 不进庙，门口拍完就走\n🎭 有时有传统舞蹈还愿表演' },
     { name: 'Siam Paragon', lat: 13.7465, lng: 100.5350, type: 'spot', time: '10:00', desc: '暹罗百丽宫，地下美食广场超大，G层有food court',
       xhsKeyword: 'Siam Paragon 曼谷 美食 2025', gmap: 'Siam Paragon Bangkok' },
-    { name: 'CentralWorld', lat: 13.7469, lng: 100.5393, type: 'spot', time: '11:30', desc: '东南亚最大商场之一，对面就是四面佛',
+    { name: 'CentralWorld', lat: 13.7469, lng: 100.5393, type: 'spot', time: '11:30', desc: '东南亚最大商场之一，从Siam步行天桥直通过来',
       gmap: 'CentralWorld Bangkok' },
     { name: 'Inter Restaurant', lat: 13.7450, lng: 100.5365, type: 'food', time: '12:30', desc: '老牌泰餐食堂，泰式炒粉+打抛饭+冬阴功，便宜好吃',
       budget: '¥30-50/人', pay: { cash: 1, card: 0.5 }, xhsKeyword: 'Inter Restaurant 曼谷 暹罗',
       gmap: 'Inter Restaurant Siam Square Bangkok', detail: '📍 Siam Square Soi 9\n🍜 招牌：Pad Thai、打抛猪肉饭、冬阴功\n💰 人均150-200泰铢\n⭐ 本地人和游客都爱，饭点需排队15-20分钟' },
-    { name: '四面佛 (Erawan Shrine)', lat: 13.7445, lng: 100.5407, type: 'spot', time: '14:00', desc: '路过拍照即可，不进庙',
-      gmap: 'Erawan Shrine Bangkok' },
-    { name: 'Yaowarat 唐人街夜市', lat: 13.7405, lng: 100.5100, type: 'food', time: '18:00', desc: '霓虹灯港风街拍+燕窝糖水+咖喱蟹+烤鱿鱼，周二至周日',
+    { name: 'King Power Mahanakhon 玻璃天桥', lat: 13.7235, lng: 100.5285, type: 'spot', time: '15:30', desc: '泰国最高楼！314米玻璃 SkyWalk，脚底悬空俯瞰曼谷，日落时分绝了',
+      budget: '¥170-200/人', pay: { card: 1, cash: 0.5 }, reserve: 'https://kingpowermahanakhon.co.th',
+      xhsKeyword: 'Mahanakhon SkyWalk 曼谷 玻璃天桥 日落', gmap: 'King Power Mahanakhon Bangkok',
+      detail: '🚇 BTS Chong Nonsi站步行3分钟\n🕐 10:00–00:00（最晚入场23:00）\n🏢 74-78层，314米高\n🪟 玻璃地板 SkyWalk — 脚底悬空！\n🌅 建议16:00到，看日落+夜景\n💰 门票~880泰铢（约¥170）\n📸 天台rooftop bar可喝一杯\n⚠️ 穿长裤/短裤都行，但裙装不方便踩玻璃' },
+    { name: 'Yaowarat 唐人街夜市', lat: 13.7405, lng: 100.5100, type: 'food', time: '18:30', desc: '霓虹灯港风街拍+燕窝糖水+咖喱蟹+烤鱿鱼，周二至周日',
       budget: '¥60-100/人', pay: { cash: 1 }, xhsKeyword: '曼谷唐人街 耀华力路 美食 2025',
       gmap: 'Yaowarat Road Chinatown Bangkok', detail: '🚇 MRT Wat Mangkon站1号出口\n🕐 周二至周日 16:00–22:00\n🧊 燕窝糖水~50泰铢\n🦀 泰式咖喱蟹、大蟹肉卷\n🍢 烤鱿鱼甜辣酱\n⚠️ 人潮拥挤，建议17:00到' }
   ]},
 
   // ═══ Day 3: 素坤逸+SPA ═══
-  { id: 3, label: 'D3', date: '9月24日 周四', title: '曼谷 · 素坤逸深度 + SPA', color: '#af52de', locations: [
+  { id: 3, label: 'D3', date: '9月24日 周四', title: '曼谷 · 素坤逸+SPA+湄南河游船', color: '#af52de', locations: [
     { name: 'Emsphere + EmQuartier', lat: 13.7300, lng: 100.5690, type: 'spot', time: '10:00', desc: 'Phrom Phong新商场群，设计感强，Emsphere有网红美食层',
       xhsKeyword: 'Emsphere 曼谷 2025 美食', gmap: 'Emsphere Bangkok' },
     { name: 'The Commons Thonglor', lat: 13.7340, lng: 100.5790, type: 'food', time: '12:00', desc: '社区型美食空间，Roast早午餐/各式小店，文艺范',
@@ -264,9 +269,13 @@ const DAYS = [
       budget: '¥130/人', pay: { cash: 1, card: 1 }, reserve: 'https://healthland.co.th',
       xhsKeyword: 'Health Land 曼谷 Asoke 体验', gmap: 'Health Land Asoke Bangkok',
       detail: '📍 55/5 Sukhumvit 21 Soi Asoke\n🕐 9:00–24:00\n💆 传统泰式按摩 2h ~650泰铢\n📅 提前一天在 healthland.co.th 预约\n🚇 BTS Asok / MRT Sukhumvit 步行5分钟' },
-    { name: 'Asiatique 河滨夜市', lat: 13.7030, lng: 100.4900, type: 'food', time: '18:30', desc: '河边仓库改造，摩天轮+餐厅+小店，BTS到Saphan Taksin转免费船',
-      budget: '¥60-100/人', pay: { cash: 1, card: 0.5 }, xhsKeyword: 'Asiatique 曼谷 河滨夜市',
-      gmap: 'Asiatique The Riverfront Bangkok', detail: '🚇 BTS Saphan Taksin站→免费接驳船\n🕐 17:00–00:00\n🎡 河滨摩天轮（拍照>乘坐）\n🍜 河边餐厅、泰餐、海鲜\n🛍️ 伴手礼、手工艺品\n💡 傍晚去最好，日落+夜景' }
+    { name: '湄南河游船晚餐 🚢', lat: 13.7320, lng: 100.5130, type: 'food', time: '17:30', desc: 'River City码头出发，日落/夜景游船，自助晚餐+live音乐，2小时',
+      budget: '¥150-250/人', pay: { card: 1, cash: 0.5 }, reserve: 'https://www.chaophrayacruise.com',
+      xhsKeyword: '湄南河游船 曼谷 晚餐 2025 推荐', gmap: 'River City Bangkok Chao Phraya Cruise',
+      detail: '🚢 出发码头：River City Bangkok（Soi Charoen Krung 24）\n🕐 通常17:30 check-in，18:00–20:00 航行\n🍽️ 自助晚餐+live乐队+传统舞蹈\n🌅 日落场性价比最高（既看日落又看夜景）\n💰 淘宝/KKday提前订 ¥150-250/人\n🏨 热门船：白玉兰号、公主号、璀璨号\n⚠️ 提前2-3天预订，选上层甲板位' },
+    { name: 'Asiatique 河滨夜市', lat: 13.7030, lng: 100.4900, type: 'spot', time: '20:30', desc: '游船回来顺路逛，摩天轮+河边酒吧+伴手礼店，或直接回酒店休息',
+      budget: '¥0-50', pay: { cash: 1, card: 0.5 }, xhsKeyword: 'Asiatique 曼谷 河滨夜市',
+      gmap: 'Asiatique The Riverfront Bangkok', detail: '🚇 BTS Saphan Taksin站→免费接驳船\n🕐 17:00–00:00\n🎡 河滨摩天轮（拍照>乘坐）\n🛍️ 伴手礼、手工艺品\n💡 SPA后+游船后可能累了，量力而行' }
   ]},
 
   // ═══ Day 4: 飞普吉 ═══
@@ -370,7 +379,7 @@ function overviewContent() {
   <div class="info-card"><div class="label">🏨 曼谷酒店</div><div class="value">素坤逸20号万怡酒店<br><span style="font-size:13px;color:#86868b">~¥500/晚·3晚</span></div></div>
   <div class="info-card"><div class="label">🏨 普吉酒店</div><div class="value">Avista Grande Karon<br><span style="font-size:13px;color:#86868b">~¥700/晚·4晚</span></div></div>
   <div class="info-card"><div class="label">✈️ 航班</div><div class="value">春秋+亚航/狮航<br><span style="font-size:13px;color:#86868b">四段人均¥2,600</span></div></div>
-  <div class="info-card"><div class="label">💳 人均预算</div><div class="value">~¥7,500<br><span style="font-size:13px;color:#34c759">含¥2,300购物空间</span></div></div>
+  <div class="info-card"><div class="label">💳 人均预算</div><div class="value">~¥8,000<br><span style="font-size:13px;color:#34c759">含¥1,800购物空间</span></div></div>
 </div>
 <div class="section-head">行程概览</div>
 <div class="day-list">
@@ -397,6 +406,8 @@ ${DAYS.slice(1).map(d=>`<div class="card" onclick="go(${d.id})"><div class="name
   <p>🌧️ 9月<strong>每天带伞</strong>，普吉下午大概率下雨</p>
   <p>📅 <strong>提前订：</strong>Health Land SPA（提前1天）、海豚出海团（提前1周）、机票（提前2-4周）</p>
   <p>🐬 <strong>浮潜+海豚：</strong>皇帝岛Raya Island浮潜（水清鱼多）+ Maithon岛追踪野生海豚</p>
+  <p>🏢 <strong>Mahanakhon天桥：</strong>泰国最高楼314米玻璃SkyWalk，日落时分最美，¥170/人</p>
+  <p>🚢 <strong>湄南河游船：</strong>River City码头出发，日落自助晚宴，2小时，¥150-250/人</p>
 </div>
 
 <div class="section-head">图例</div>
